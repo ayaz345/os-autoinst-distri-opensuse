@@ -33,13 +33,8 @@ class RegProxy(socketserver.StreamRequestHandler):
 		if path[:4] != "/v2/":
 			return path
 
-		proxy = False
-		for repo in proxied_repos:
-			if path[4:5+len(repo)] == repo + "/":
-				proxy = True
-				break
-
-		newpath = "/v2/" + prefix + path[4:]
+		proxy = any(path[4:5+len(repo)] == f"{repo}/" for repo in proxied_repos)
+		newpath = f"/v2/{prefix}{path[4:]}"
 		return newpath if proxy else path
 
 	def relayHttp(self, sock, requestline):
@@ -58,10 +53,10 @@ class RegProxy(socketserver.StreamRequestHandler):
 
 		# Send the reply from server to client
 		while True:
-			buf = sock.read(1024)
-			if not buf:
+			if buf := sock.read(1024):
+				self.wfile.write(buf)
+			else:
 				break
-			self.wfile.write(buf)
 
 	def handle(self):
 		# Read and disassmeble the request line

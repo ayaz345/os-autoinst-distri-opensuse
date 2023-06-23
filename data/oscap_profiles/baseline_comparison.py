@@ -33,11 +33,11 @@ def getRemediatedBaseline(file_input, file_output):
     with open(file_input) as in_file:
         with open(file_output, 'w') as out_file:
             for line in in_file:
-                if not tag_found:
-                    if line.__contains__(tag):
-                        tag_found = True
-                else:
+                if tag_found:
                     out_file.write(line)
+
+                elif line.__contains__(tag):
+                    tag_found = True
 
 
 getRemediatedBaseline("oscap_xccdf_remediate-stdout", "remediate-stdout-reformatted")
@@ -50,28 +50,32 @@ count_fail_to_error = 0
 count_fail_to_fail = 0
 
 baseline_result = open('baseline_comparison_result', 'w')
-baseline_result.write('Total counts of evaluated baseline: ' + str(len(baseline_orig)) + '\n')
-baseline_result.write('Total counts of remediated baseline: ' + str(len(baseline_remediated)) + '\n')
+baseline_result.write(
+    f'Total counts of evaluated baseline: {len(baseline_orig)}' + '\n'
+)
+baseline_result.write(
+    f'Total counts of remediated baseline: {len(baseline_remediated)}' + '\n'
+)
 baseline_result.write('\n')
 baseline_result.write('--- Baseline Change Log After Remediation---\n')
 
 for k, v in baseline_remediated.items():
     baseline_result.write(k + ':\n')
     status_orig = baseline_orig.get(k)
-    baseline_result.write(status_orig + ' -> ' + v + '\n')
+    baseline_result.write(f'{status_orig} -> {v}' + '\n')
     baseline_result.write('\n')
 
-    if v == 'fixed':
-        count_fail_to_fixed += 1
-    elif v == 'error':
+    if v == 'error':
         count_fail_to_error += 1
     elif v == 'fail':
         count_fail_to_fail += 1
 
+    elif v == 'fixed':
+        count_fail_to_fixed += 1
 # Output basic remediation stats
-print('Total baseline remediated: ' + str(len(baseline_remediated)))
+print(f'Total baseline remediated: {len(baseline_remediated)}')
 print('Remediation change counts: ')
-print('fail -> fixed: ' + str(count_fail_to_fixed))
-print('fail -> error: ' + str(count_fail_to_error))
-print('fail -> fail: ', str(count_fail_to_fail))
+print(f'fail -> fixed: {str(count_fail_to_fixed)}')
+print(f'fail -> error: {str(count_fail_to_error)}')
+print('fail -> fail: ', count_fail_to_fail)
 

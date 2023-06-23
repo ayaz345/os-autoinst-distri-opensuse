@@ -75,12 +75,13 @@ if __name__ == '__main__':
       if (len(kv) == 2):
         ext_delegate_options[kv[0].strip()] = kv[1].strip()
       else:
-        raise RuntimeError('Error parsing delegate option: ' + o)
+        raise RuntimeError(f'Error parsing delegate option: {o}')
 
   # load external delegate
   if args.ext_delegate is not None:
-    print('Loading external delegate from {} with args: {}'.format(
-        args.ext_delegate, ext_delegate_options))
+    print(
+        f'Loading external delegate from {args.ext_delegate} with args: {ext_delegate_options}'
+    )
     ext_delegate = [
         tflite.load_delegate(args.ext_delegate, ext_delegate_options)
     ]

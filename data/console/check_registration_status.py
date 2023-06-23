@@ -19,9 +19,9 @@ proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 stdout, stderr = proc.communicate()
 
 if proc.returncode != 0:
-    print("Error executing command: %s" % ' '.join(cmd))
-    print("stderr: %s" % stderr)
-    print("stdout: %s" % stdout)
+    print(f"Error executing command: {' '.join(cmd)}")
+    print(f"stderr: {stderr}")
+    print(f"stdout: {stdout}")
 
 # SUSEConnect status of every product (base product, extension or module),
 # should has the same version with current system, either "Not Registered"
@@ -34,20 +34,20 @@ try:
         prod['result'] = 'match'
 
         # Module version is not service pack specific
-        if prod['identifier'].find('module') != -1:
-            if dist['BASE_VERSION'] != prod['base_version']:
-                prod['result'] = 'mismatch'
-        else:
+        if prod['identifier'].find('module') == -1:
             if dist['VERSION_ID'] != prod['version']:
                 # Live Patching is seen as Module before SLE12SP3, then seen as extension since SLE12SP3
                 # So its version should equal the base product's base version before SLE12SP3, while equal 
-                # the base product's version since SLE12SP3. 
-                if dist['VERSION_ID'] >= '12.3':
+                # the base product's version since SLE12SP3.
+                if (
+                    dist['VERSION_ID'] < '12.3'
+                    and dist['BASE_VERSION'] != prod['version']
+                    or dist['VERSION_ID'] >= '12.3'
+                ):
                     prod['result'] = 'mismatch'
-                else:
-                    if dist['BASE_VERSION'] != prod['version']:
-                        prod['result'] = 'mismatch'
 
+        elif dist['BASE_VERSION'] != prod['base_version']:
+            prod['result'] = 'mismatch'
         if prod['result'] == 'mismatch':
             ret += 1
         print("Product %(identifier)s with version %(version)s is %(status)s [%(result)s]" % prod)

@@ -20,9 +20,9 @@ if usePAM:
 	def pamconv(auth, qlist):
 		resp = []
 		for (query,hint) in qlist:
-			if hint == pam.PAM_PROMPT_ECHO_ON or hint == pam.PAM_PROMPT_ECHO_OFF:
+			if hint in [pam.PAM_PROMPT_ECHO_ON, pam.PAM_PROMPT_ECHO_OFF]:
 				resp.append((password, 0))
-			elif hint == pam.PAM_PROMPT_ERROR_MSG or hint == pam.PAM_PROMPT_TEXT_INFO:
+			elif hint in [pam.PAM_PROMPT_ERROR_MSG, pam.PAM_PROMPT_TEXT_INFO]:
 				print(query)
 				resp.append(('', 0));
 			else:

@@ -21,6 +21,6 @@ if os.path.exists(output_file):
         scores = np.squeeze(scores)
         ranks = np.argsort(scores)[::-1]
 
-        for rank in ranks[0:5]:
+        for rank in ranks[:5]:
             print("class='%s' with probability=%f" % (labels[rank], scores[rank]))
 

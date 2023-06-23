@@ -11,8 +11,7 @@ def parse_csv(parsefile, os_version, os_build, vswitch_version, openqa_url):
     with open(parsefile, 'rb') as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=',')
         for row in csvreader:
-            request_string = 'throughput,'
-            request_string += (
+            request_string = 'throughput,' + (
                 'tx_frames={0},'
                 'rx_frames={1},'
                 'tx_rate_fps={2},'
@@ -29,7 +28,8 @@ def parse_csv(parsefile, os_version, os_build, vswitch_version, openqa_url):
                 'deployment={13},'
                 'vswitch={14},'
                 'traffic_type={15},'
-                'test_execution_time={16},').format(
+                'test_execution_time={16},'
+            ).format(
                 row['tx_frames'],
                 row['rx_frames'],
                 row['tx_rate_fps'],
@@ -46,7 +46,8 @@ def parse_csv(parsefile, os_version, os_build, vswitch_version, openqa_url):
                 row['deployment'],
                 row['vswitch'],
                 row['traffic_type'],
-                row['test_execution_time'])
+                row['test_execution_time'],
+            )
             request_string += (
                 'os_version={0},'
                 'os_build={1},'
@@ -81,7 +82,7 @@ parser.add_argument('--vswitch_version')
 parser.add_argument('--openqa_url')
 args = parser.parse_args()
 
-url = args.targeturl + '/write?db=nfv_perf_data'
+url = f'{args.targeturl}/write?db=nfv_perf_data'
 
 if args.parsefile:
     logging.info('Starting export. parserfile={0} targeturl={1}'

@@ -12,7 +12,7 @@ class MyDumper(yaml.Dumper):
 
     
 def _get_scheduling(jobid, srv):
-    testpage = 'https://%s/tests/%s/file/autoinst-log.txt' % (srv, jobid)
+    testpage = f'https://{srv}/tests/{jobid}/file/autoinst-log.txt'
     ctx = requests.get(testpage, verify=False)
     regex = re.compile('scheduling\s\w+\stests\/\w+\/\w+\/?\w*')
     matches = regex.findall(repr(ctx.content))
@@ -25,19 +25,18 @@ def _get_scheduling(jobid, srv):
 
 
 def _get_conf(jobid, srv):
-    client = OpenQA_Client(server='http://%s' % srv)
-    conf = client.openqa_request('GET', 'jobs/%s' % jobid)
+    client = OpenQA_Client(server=f'http://{srv}')
+    conf = client.openqa_request('GET', f'jobs/{jobid}')
 
     testname = conf['job']['settings']['TEST_SUITE_NAME']
-    jobvars = {}
-    jobvars['name'] = testname
+    jobvars = {'name': testname}
     suitevars = client.openqa_request('GET', 'test_suites')
 
-    vars_generator = (settings for settings in suitevars['TestSuites'])
+    vars_generator = iter(suitevars['TestSuites'])
 
     for v in vars_generator:
         if testname == v.get('name'):
-            jobvars.update(v)
+            jobvars |= v
             break
     return jobvars
 
